@@ -2,6 +2,7 @@
 <head>
     <title>Hello World</title>
     <link rel="stylesheet" href="/static/css/leaflet.css" />
+    <script src="/static/js/jquery-3.1.1.min.js"></script>
     <script src="/static/js/leaflet.js"></script>
     <script src="/static/js/leaflet-heat.js"></script>
     <style type="text/css">
@@ -22,35 +23,10 @@
             id: 'mapbox.streets'
         }).addTo(mymap);
 
-        // L.marker([51.5, -0.09]).addTo(mymap)
-        //     .bindPopup("<b>Hello world!</b><br />I am a popup.").openPopup();
+        $.get('/api/')
+            .then(function (data) {
+                L.heatLayer([data], {radius: 25}).addTo(mymap);
+            })
 
-        // L.circle([51.508, -0.11], 500, {
-        //     color: 'red',
-        //     fillColor: '#f03',
-        //     fillOpacity: 0.5
-        // }).addTo(mymap).bindPopup("I am a circle.");
-
-        // L.polygon([
-        //     [51.509, -0.08],
-        //     [51.503, -0.06],
-        //     [51.51, -0.047]
-        // ]).addTo(mymap).bindPopup("I am a polygon.");
-
-        L.heatLayer([
-             [39.74, -75.545, 15]
-        ], {radius: 25}).addTo(mymap);
-
-
-        // var popup = L.popup();
-
-        // function onMapClick(e) {
-        //     popup
-        //         .setLatLng(e.latlng)
-        //         .setContent("You clicked the map at " + e.latlng.toString())
-        //         .openOn(mymap);
-        // }
-
-        // mymap.on('click', onMapClick);
     </script>
 </body>

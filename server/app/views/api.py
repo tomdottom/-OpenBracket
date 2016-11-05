@@ -1,9 +1,12 @@
-from flask import Blueprint, render_template
+from flask import Blueprint
+from flask_restful import Resource, Api
 
-api = Blueprint('api', __name__)
+api_bp = Blueprint('api', __name__)
+api = Api(api_bp)
 
 
-@api.route('/')
-def query():
-    # return render_template('index.html')
-    return "foo"
+class SampleData(Resource):
+    def get(self):
+        return [39.74, -75.545, 15]
+
+api.add_resource(SampleData, '/')
