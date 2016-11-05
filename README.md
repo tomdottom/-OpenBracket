@@ -1,8 +1,8 @@
 # OpenBracket
 
-<img src="https://raw.githubusercontent.com/OpenBracketDelaware/Open-Source-Target-Marketing-Solution-Group3/master/readme_images/population_heatmap.png" alt="Population Density Heatmap" title="Population Density Heatmap" style="max-width:250px">
+![Population Density Heatmap](https://raw.githubusercontent.com/OpenBracketDelaware/Open-Source-Target-Marketing-Solution-Group3/master/readme_images/population_heatmap.png "Population Density Heatmap" width=250)
 
-<img src="https://raw.githubusercontent.com/OpenBracketDelaware/Open-Source-Target-Marketing-Solution-Group3/master/readme_images/readme_images/worker_flow__heatmap.png" alt="Worker Flow Heatmap" title="Worker Flow Heatmap" style="max-width:250px;">
+![Worker Flow Heatmap](https://raw.githubusercontent.com/OpenBracketDelaware/Open-Source-Target-Marketing-Solution-Group3/master/readme_images/worker_flow__heatmap.png "Worker Flow Heatmap" width=250)
 
 ## Running dev server
 
