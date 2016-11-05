@@ -20,7 +20,8 @@ pip install -r ./server/dev_requirements.txt  # Note that this installs supporti
 *create user*
 ```
 mysql -u -p
-> grant all privileges on ob_census.* to ob_census_user* identified by 'ob_census_pass';
+> CREATE USER 'ob_census_user'@'%' IDENTIFIED BY 'ob_census_pass';
+> GRANT ALL PRIVILEGES ON ob_census.* TO 'ob_census_user'@'%' IDENTIFIED BY 'ob_census_pass';
 > create database ob_census;
 > use ob_census;
 > source ob_census.sql

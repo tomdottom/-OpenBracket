@@ -129,6 +129,35 @@ $(document).ready(function() {
     //         add_head_map_data_points(map, overlayMaps, data)
     //     })
 
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            //grades = [0, mapRound(0.05*max_workers_diff), mapRound(0.15*max_workers_diff), mapRound(0.30*max_workers_diff), mapRound(0.45*max_workers_diff), mapRound(0.60*max_workers_diff), mapRound(0.75*max_workers_diff), mapRound(0.90*max_workers_diff)],
+            grades = [
+                min_workers_diff,
+                mapRound(0.15*max_workers_diff),
+                mapRound(0.40*max_workers_diff),
+                mapRound(0.65*max_workers_diff),
+                mapRound(0.90*max_workers_diff)
+            ],
+
+            labels = [],
+            from, to;
+
+        for (var i = 0; i < grades.length; i++) {
+            from = grades[i];
+            to = grades[i + 1];
+
+            labels.push(
+                '<i style="background:' + getColor(from + 1) + '"></i> ' +
+                from + (to ? '&ndash;' + to : '+'));
+        }
+
+        div.innerHTML = labels.join('<br>');
+        return div;
+    };
 
     $.get('/api/tract_populations/')
         .then(function(data) {
@@ -148,5 +177,7 @@ $(document).ready(function() {
                 }).addTo(map)
             })
 
-        })
+        }).then(function() {
+            legend.addTo(map);
+        });
 })
