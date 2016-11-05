@@ -50,7 +50,7 @@ $(document).ready(function() {
 
     var overlayMaps = init_map_layers(map)
 
-    $.get('/api/')
+    $.get('/api/census/')
         .then(function (data) {
             add_head_map_data_points(map, overlayMaps, data)
         })

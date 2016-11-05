@@ -32,11 +32,11 @@ def CenusDatum(
     }
 
 
-class SampleData(Resource):
+class FakeCensus(Resource):
     def get(self):
         return [
             CenusDatum(39.72, -75.545, 15, 6, 10, 14, 1, 1, 1, 1, 1, 1, "foo"),
             CenusDatum(39.74, -75.544, 15, 7, 5, 3, 1, 1, 1, 1, 1, 1, "foo")
         ]
 
-api.add_resource(SampleData, '/')
+api.add_resource(FakeCensus, '/census/')
