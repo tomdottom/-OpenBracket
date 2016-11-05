@@ -3,6 +3,7 @@
     <title>Hello World</title>
     <link rel="stylesheet" href="/static/css/leaflet.css" />
     <script src="/static/js/leaflet.js"></script>
+    <script src="/static/js/leaflet-heat.js"></script>
     <style type="text/css">
         #mapid { height: 500px; width: 500px; }
     </style>
@@ -34,6 +35,10 @@
             [51.503, -0.06],
             [51.51, -0.047]
         ]).addTo(mymap).bindPopup("I am a polygon.");
+
+        L.heatLayer([
+            [51.5, -0.08, "10"],
+        ], {radius: 25}).addTo(mymap);
 
 
         var popup = L.popup();
