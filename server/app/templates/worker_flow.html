@@ -132,7 +132,7 @@
 
             labels.push(
                 '<i style="background:' + getColor(from + 1) + '"></i> ' +
-                from + (to ? '&ndash;' + to : '+'));
+                from.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + (to ? '&ndash;' + to.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '+'));
         }
 
         div.innerHTML = labels.join('<br>');
@@ -206,11 +206,7 @@ $(document).ready(function() {
                     }).addTo(zipcode_map);
 
 
-
-
                     legend.addTo(zipcode_map);
-
-
 
 
                 })
