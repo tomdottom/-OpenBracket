@@ -38,12 +38,7 @@ class CensusOriginDestinationEmployment(Resource):
             for t in tracts
         }
 
-        # TODO: I don't this we have to use response
-        return Response(
-            response=json.dumps(obj_list),
-            status=200,
-            mimetype="application/json"
-        )
+        return obj_list
 
 
 api.add_resource(
