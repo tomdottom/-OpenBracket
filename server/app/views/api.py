@@ -1,4 +1,6 @@
-from flask import Blueprint
+import json
+
+from flask import Blueprint, current_app, Response
 from flask_restful import Resource, Api
 
 import us_census.query
@@ -6,9 +8,28 @@ import us_census.query
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
 
+db = None
+
+from .. import models
 
 class Census(Resource):
     def get(self):
         return us_census.query.query()
 
 api.add_resource(Census, '/census/')
+
+
+class CensusOriginDestinationEmployment(Resource):
+    def get(self):
+
+        tracts = db.session.query(models.CensusTractNonResidentWorker)
+
+        obj_list = {t.geocode_tract: {'workers_in': t.workers_in, 'workers_out': t.workers_out, 
+            'workers_diff': t.workers_diff} for t in tracts}
+
+        return Response(response=json.dumps(obj_list), status=200, mimetype="application/json")
+
+
+api.add_resource(CensusOriginDestinationEmployment, '/census_origin_destination_employment/')
+
+

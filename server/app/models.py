@@ -6,11 +6,17 @@ from sqlalchemy import desc, distinct, text, func
 
 from sqlalchemy.orm import relationship, backref, column_property
 
-from app import db
+from sqlalchemy.ext.declarative import declarative_base
+
+
+Base = declarative_base()
+metadata = Base.metadata
+
+db = None
 
 
 
-class CensusOriginDestinationEmployment(db.Model):
+class CensusOriginDestinationEmployment(Base):
     __tablename__ = 'census_origin_destination_employment'
 
     id = Column(Integer, primary_key=True)
@@ -31,7 +37,7 @@ class CensusOriginDestinationEmployment(db.Model):
 
 
 
-class CensusTractNonResidentWorker(db.Model):
+class CensusTractNonResidentWorker(Base):
     __tablename__ = 'census_tract_non_resident_workers'
 
     id = Column(Integer, primary_key=True)

@@ -3,6 +3,9 @@ import os
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from views.api import api_bp
+import views.api
+import models
+#import manage
 
 from config import *
 
@@ -17,6 +20,11 @@ app.config.from_object(eval(config))
 
 db = SQLAlchemy(app)
 
+views.api.db = db
+#models.init(db)
+#manage.db = db
+models.db = db
+
 app.register_blueprint(api_bp, url_prefix='/api')
 
 @app.route('/')
@@ -26,5 +34,5 @@ def index():
 
 @app.route('/test')
 def test():
-    return render_template('index.html', name="foo")
+    return render_template('test.html', name="foo")
 

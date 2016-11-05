@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="/static/js/libs/jquery-3.1.1.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="/static/css/leaflet.css" />
+
+    <script src="/static/js/libs/lodash.js"></script>
+    <script src="/static/js/libs/leaflet.js"></script>
+    <script src="/static/js/libs/leaflet-heat.js"></script>
+    <style type="text/css">
+        #mapid {
+            height: 600px;
+        }
+    </style>
+
+
+
+    <style>
+        .info { 
+            padding: 6px 8px; 
+            font: 14px/16px Arial, Helvetica, sans-serif; 
+            background: white; 
+            background: rgba(255,255,255,0.8); 
+            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
+            border-radius: 5px; 
+        } 
+        .info h4 { 
+            margin: 0 0 5px; 
+            color: #777; 
+        }
+        .legend { 
+            text-align: left; 
+            line-height: 18px; 
+            color: #555;
+        }
+        .legend i { 
+            width: 18px; 
+            height: 18px; 
+            float: left;
+            margin-right: 8px; 
+            opacity: 0.7;
+        }
+    </style>
+
+    <title>Hello World</title>
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Census Visualisation</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron" style="padding: 20px;">
+                    <div id="mapid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--<script src="/static/js/app.js"></script>-->
+
+
+
+<script>
+
+    //alert(max_total_amount);
+
+    var max_num_contrib = 0;
+    var max_total_amount = 0;
+
+    var zipcode_map = L.map('mapid').setView([39.12, -75.21], 9);
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery &copy; <a href="http://mapbox.com">Mapbox</a>',
+        id: 'mapbox.light'
+    }).addTo(zipcode_map);
+
+
+    // control that shows state info on hover
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+    };
+
+    info.update = function (props) {
+        this._div.innerHTML = '<h4>DE Census tracts</h4>' +  (props ?
+            '<b>' + props.workers_in + ' workers in minus ' + props.workers_out + ' out for a difference of ' + props.workers_diff + '</b><br />'
+            : 'Hover over a tract');
+    };
+
+    info.addTo(zipcode_map);
+
+    function mapRound(x){
+        return Math.ceil(x / 100.0) * 100
+    }
+
+    // get color depending on population density value
+    function getColor(d) {
+        return d > mapRound(0.90*max_total_amount) ? '#800026' :
+                //d > mapRound(0.75*max_total_amount)  ? '#BD0026' :
+                d > mapRound(0.65*max_total_amount)  ? '#E31A1C' :
+                //d > mapRound(0.45*max_total_amount)  ? '#FC4E2A' :
+                d > mapRound(0.40*max_total_amount)   ? '#FD8D3C' :
+                //d > mapRound(0.15*max_total_amount)   ? '#FEB24C' :
+                d > mapRound(0.15*max_total_amount)   ? '#FED976' :
+                d > 1   ? '#FFEDA0' :
+
+                            '#FFFFFF';
+    }
+
+    function style(feature) {
+        return {
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7,
+            fillColor: getColor(feature.properties.workers_diff)
+        };
+    }
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+
+        info.update(layer.feature.properties);
+    }
+
+    var geojson;
+
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+        info.update();
+    }
+
+    function zoomToFeature(e) {
+        zipcode_map.fitBounds(e.target.getBounds());
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            //click: zoomToFeature
+        });
+    }
+
+
+
+
+
+    zipcode_map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+    var legend = L.control({position: 'bottomright'});
+
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            //grades = [0, mapRound(0.05*max_total_amount), mapRound(0.15*max_total_amount), mapRound(0.30*max_total_amount), mapRound(0.45*max_total_amount), mapRound(0.60*max_total_amount), mapRound(0.75*max_total_amount), mapRound(0.90*max_total_amount)],
+            grades = [0, 1, mapRound(0.15*max_total_amount), mapRound(0.40*max_total_amount), mapRound(0.65*max_total_amount), mapRound(0.90*max_total_amount)],
+
+            labels = [],
+            from, to;
+
+        for (var i = 0; i < grades.length; i++) {
+            from = grades[i];
+            to = grades[i + 1];
+
+            labels.push(
+                '<i style="background:' + getColor(from + 1) + '"></i> ' +
+                from + (to ? '&ndash;' + to : '+'));
+        }
+
+        div.innerHTML = labels.join('<br>');
+        return div;
+    };
+
+
+
+
+$(document).ready(function() {
+
+
+    //alert( 'hi there dude.' );
+
+    //var combined_data = 'hi'
+
+    // Pull in zipcode data
+    $.getJSON( "{{ url_for('static', filename='json/de_census_boundaries.json') }}", function() {
+            //console.log( "success" );
+        })
+        .done(function( boundary_data ) {
+            //console.log( "second success" );
+
+            //console.log(boundary_data)
+
+            // Pull in donation data by zipcode
+            $.getJSON( "/api/census_origin_destination_employment", function() {
+                    //console.log( "success 2" );
+                })
+                .done(function( census_data ) {
+                    //console.log( "second success 2" );
+
+                    //console.log(census_data)
+
+                    //alert( combined_data );
+
+                    for (i in boundary_data.features) {
+
+                        //console.log(boundary_data.features[i])
+
+                        // "name":"19962","zipcode":19962,"num_contrib":"8","total_amount":"3400.00"
+
+                        boundary_data.features[i].properties.workers_in = 0;
+                        boundary_data.features[i].properties.workers_out = 0;
+                        boundary_data.features[i].properties.workers_diff = 0;
+
+                        if (boundary_data.features[i].properties.GEOID in census_data) {
+                            //console.log('found: '+boundary_data.features[i].properties.ZCTA5CE10)
+
+                            key = boundary_data.features[i].properties.GEOID
+                            boundary_data.features[i].properties.workers_in = census_data[key].workers_in;
+                            boundary_data.features[i].properties.workers_out = census_data[key].workers_out;
+                            boundary_data.features[i].properties.workers_diff = census_data[key].workers_diff;
+
+                            if ( max_num_contrib < census_data[key].workers_in ) {
+                                 max_num_contrib = census_data[key].workers_in;
+                            }
+
+                            //console.log('curr: '+max_total_amount+ ' & test: '+census_data[key].amount_donated)
+
+                            // Javascript doesn't like decimal notation ...
+                            if ( parseInt(max_total_amount) < parseInt(census_data[key].workers_in) ) {
+                                 max_total_amount = census_data[key].workers_in;
+                            }
+
+                        }
+                        else {
+                            //console.log('missing: '+boundary_data.features[i].properties.ZCTA5CE10)
+                        }
+                    }
+
+                    //alert(max_total_amount);
+
+                    geojson = L.geoJson(boundary_data, {
+                        style: style,
+                        onEachFeature: onEachFeature
+                    }).addTo(zipcode_map);
+
+
+
+
+                    legend.addTo(zipcode_map);
+
+
+
+
+                })
+                .fail(function() {
+                    console.log( "error 2" );
+                })
+                .always(function() {
+                    //console.log( "getJSON().always() 2" );
+                });
+            // End Pull in donation data by zipcode
+
+
+
+
+        })
+        .fail(function() {
+            console.log( "error" );
+        })
+        .always(function() {
+            //console.log( "getJSON().always()" );
+        });
+ 
+
+    // alert( 'by dude' );
+
+
+} );
+
+
+
+</script>
+
+
+
+
+
+</body>
