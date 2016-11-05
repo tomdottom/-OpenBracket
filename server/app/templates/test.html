@@ -215,18 +215,10 @@
 $(document).ready(function() {
 
 
-    //alert( 'hi there dude.' );
-
-    //var combined_data = 'hi'
-
     // Pull in zipcode data
     $.getJSON( "{{ url_for('static', filename='json/de_census_boundaries.json') }}", function() {
-            //console.log( "success" );
         })
         .done(function( boundary_data ) {
-            //console.log( "second success" );
-
-            //console.log(boundary_data)
 
             // Pull in donation data by zipcode
             $.getJSON( "/api/census_origin_destination_employment", function() {
@@ -304,9 +296,7 @@ $(document).ready(function() {
         .always(function() {
             //console.log( "getJSON().always()" );
         });
- 
 
-    // alert( 'by dude' );
 
 
 } );
@@ -314,9 +304,5 @@ $(document).ready(function() {
 
 
 </script>
-
-
-
-
 
 </body>

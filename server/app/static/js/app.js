@@ -46,12 +46,107 @@ function init_map_layers(map) {
 
 $(document).ready(function() {
 
-    var map = init_map()
+    var map = init_map();
+
+    var info = L.control();
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info');
+        this.update();
+        return this._div;
+    };
+
+    info.update = function (props) {
+        // this._div.innerHTML = props.population;
+        this._div.innerHTML = '<h4>Population: ' + (props ? props.population : '-') + '</h4>'
+    };
+
+    info.addTo(map);
+
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        info.update(layer.feature.properties);
+    }
+
+    function resetHighlight(e) {
+        var layer = e.target;
+        L.geoJSON(null, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).resetStyle(e.target);
+        info.update();
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+        });
+    }
+    function mapRound(x){
+        return Math.ceil(x / 100.0) * 100
+    }
+
+    // get color depending on population density value
+    var max_workers_diff = 0;
+    window.tmp = max_workers_diff;
+    var min_workers_diff = 0;
+
+    function getColor(d) {
+        return d > mapRound(0.90*max_workers_diff) ? '#800026' :
+                //d > mapRound(0.75*max_workers_diff)  ? '#BD0026' :
+                d > mapRound(0.65*max_workers_diff)  ? '#E31A1C' :
+                //d > mapRound(0.45*max_workers_diff)  ? '#FC4E2A' :
+                d > mapRound(0.40*max_workers_diff)   ? '#FD8D3C' :
+                //d > mapRound(0.15*max_workers_diff)   ? '#FEB24C' :
+                d > mapRound(0.15*max_workers_diff)   ? '#FED976' :
+                d > 1 ? '#FFEDA0' : '#FFFFFF';
+    }
+
+    function style(feature) {
+        return {
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7,
+            fillColor: getColor(feature.properties.population)
+        };
+    }
 
     var overlayMaps = init_map_layers(map)
 
     $.get('/api/census/')
         .then(function (data) {
             add_head_map_data_points(map, overlayMaps, data)
+        })
+
+
+    $.get('/api/tract_populations/')
+        .then(function(data) {
+            _.each(data, function(item) {
+                var item_population = parseInt(item.properties.population, 10);
+                if (item_population > max_workers_diff) {
+                    max_workers_diff = item_population;
+                }
+            })
+            return data
+        })
+        .then(function(data) {
+            _.each(data, function(item) {
+                L.geoJSON(item, {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(map)
+            })
+
         })
 })
