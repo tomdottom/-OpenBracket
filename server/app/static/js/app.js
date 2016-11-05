@@ -1,4 +1,4 @@
-$(document).ready(function() {
+function init_map() {
 	var wilmington_de_loc = [39.74, -75.545]
 	var mymap = L.map('mapid').setView(wilmington_de_loc, 12);
 
@@ -10,8 +10,46 @@ $(document).ready(function() {
 	    id: 'mapbox.streets'
 	}).addTo(mymap);
 
+	return mymap
+}
+
+function age(key, data) {return [ data.latitude, data.longditude, data[key] ] }
+function age0to29(data) { return age('age0to29', data) }
+function age30to54(data) { return age('age30to54', data) }
+function age55plus(data) { return age('age55plus', data) }
+
+function add_head_map_data_points(map, groups, data) {
+	$.each(groups, function(name, layerGroup) {
+		layerGroup.addLayer(
+			L.heatLayer(data.map(layerGroup._extractor), {radius: 25}))
+	})
+}
+
+$(document).ready(function() {
+
+	var map = init_map()
+
+	var age0to29LayerGroup = L.layerGroup()
+	age0to29LayerGroup._extractor = age0to29
+	var age30to54LayerGroup = L.layerGroup()
+	age30to54LayerGroup._extractor = age30to54
+	var age55plusLayerGroup = L.layerGroup()
+	age55plusLayerGroup._extractor = age55plus
+
+	age0to29LayerGroup.addTo(map)
+	age30to54LayerGroup.addTo(map)
+	age55plusLayerGroup.addTo(map)
+
+	var overlayMaps = {
+	    "Under 29": age0to29LayerGroup,
+	    "30 to 54": age30to54LayerGroup,
+	    "Above 55": age55plusLayerGroup,
+	};
+
+	L.control.layers(null, overlayMaps).addTo(map);
+
 	$.get('/api/')
 	    .then(function (data) {
-	        L.heatLayer([data], {radius: 25}).addTo(mymap);
+		    add_head_map_data_points(map, overlayMaps, data)
 	    })
 })
