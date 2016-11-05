@@ -32,7 +32,7 @@ def index():
     return render_template('index.html', name="foo")
 
 
-@app.route('/test')
+@app.route('/worker_flow')
 def test():
     return render_template('test.html', name="foo")
 
