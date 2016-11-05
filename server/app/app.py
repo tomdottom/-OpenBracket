@@ -33,6 +33,6 @@ def index():
 
 
 @app.route('/worker_flow')
-def test():
-    return render_template('test.html', name="foo")
+def worker_flow():
+    return render_template('worker_flow.html', name="foo")
 
