@@ -13,9 +13,10 @@ db = None
 
 from .. import models
 
+
 class Census(Resource):
     def get(self):
-        return us_census.query.query(1, 1, 1, 1)
+        return us_census.query.query()
 
 
 class TractPopulations(Resource):
@@ -50,3 +51,4 @@ api.add_resource(
     '/census_origin_destination_employment/'
 )
 api.add_resource(TractPopulations, '/tract_populations/')
+api.add_resource(Census, '/census/')
