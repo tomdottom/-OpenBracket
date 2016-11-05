@@ -2,4 +2,9 @@ flask
 flask-restful
 colorlog
 
+sqlalchemy
+flask-sqlalchemy
+flask-script
+mysqlclient
+
 -e census
