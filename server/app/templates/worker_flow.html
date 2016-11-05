@@ -1,86 +1,7 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-    <script src="/static/js/libs/jquery-3.1.1.min.js"></script>
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="/static/css/leaflet.css" />
-
-    <script src="/static/js/libs/lodash.js"></script>
-    <script src="/static/js/libs/leaflet.js"></script>
-    <script src="/static/js/libs/leaflet-heat.js"></script>
-    <style type="text/css">
-        #mapid {
-            height: 400px;
-        }
-    </style>
-
-
-
-    <style>
-        .info { 
-            padding: 6px 8px; 
-            font: 14px/16px Arial, Helvetica, sans-serif; 
-            background: white; 
-            background: rgba(255,255,255,0.8); 
-            box-shadow: 0 0 15px rgba(0,0,0,0.2); 
-            border-radius: 5px; 
-        } 
-        .info h4 { 
-            margin: 0 0 5px; 
-            color: #777; 
-        }
-        .legend { 
-            text-align: left; 
-            line-height: 18px; 
-            color: #555;
-        }
-        .legend i { 
-            width: 18px; 
-            height: 18px; 
-            float: left;
-            margin-right: 8px; 
-            opacity: 0.7;
-        }
-    </style>
-
-    <title>Hello World</title>
-</head>
-<body>
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="#">Census Visualisation</a>
-            </div>
-        </div>
-    </nav>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="jumbotron" style="padding: 20px;">
-                    <div id="mapid"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!--<script src="/static/js/app.js"></script>-->
-
-
+{% extends 'base.html' %}
+{% block content %}
 
 <script>
-
-    //alert(max_workers_diff);
 
     var max_workers_diff = 0;
     var min_workers_diff = 0;
@@ -190,11 +111,8 @@
         });
     }
 
-
-
-
-
-    zipcode_map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+    zipcode_map.attributionControl.addAttribution(
+        'Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
 
 
     var legend = L.control({position: 'bottomright'});
@@ -310,17 +228,10 @@ $(document).ready(function() {
         })
         .fail(function() {
             console.log( "error" );
-        })
-        .always(function() {
-            //console.log( "getJSON().always()" );
         });
 
-
-
-} );
-
-
+});
 
 </script>
 
-</body>
+{% endblock %}
