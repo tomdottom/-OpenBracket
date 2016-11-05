@@ -22,7 +22,7 @@
     <script src="/static/js/libs/leaflet-heat.js"></script>
     <style type="text/css">
         #mapid {
-            height: 600px;
+            height: 400px;
         }
     </style>
 
@@ -107,7 +107,7 @@
 
     info.update = function (props) {
         this._div.innerHTML = '<h4>DE Census tracts</h4>' +  (props ?
-            '<b>' + props.workers_in + ' workers in minus ' + props.workers_out + ' out for a difference of ' + props.workers_diff + '</b><br />'
+            '<b>' + props.workers_in.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' workers in minus ' + props.workers_out.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + ' out for a difference of ' + props.workers_diff.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '</b><br />'
             : 'Hover over a tract');
     };
 
@@ -119,7 +119,9 @@
 
     // get color depending on population density value
     function getColor(d) {
-        return d > mapRound(0.90*max_workers_diff) ? '#800026' :
+        //console.log('getting color for: '+d)
+        if (d >= 0) {
+            return d > mapRound(0.90*max_workers_diff) ? '#800026' :
                 //d > mapRound(0.75*max_workers_diff)  ? '#BD0026' :
                 d > mapRound(0.65*max_workers_diff)  ? '#E31A1C' :
                 //d > mapRound(0.45*max_workers_diff)  ? '#FC4E2A' :
@@ -129,6 +131,16 @@
                 d > 1   ? '#FFEDA0' :
 
                             '#FFFFFF';
+        } else {
+
+            return d < mapRound(0.80*min_workers_diff) ? '#0570b0' :
+                //d > mapRound(0.75*max_workers_diff)  ? '#BD0026' :
+                d < mapRound(0.55*min_workers_diff)  ? '#74a9cf' :
+                //d > mapRound(0.45*max_workers_diff)  ? '#FC4E2A' :
+                d < mapRound(0.30*min_workers_diff)   ? '#bdc9e1' :
+                //d > mapRound(0.15*max_workers_diff)   ? '#FEB24C' :
+                '#f1eef6' ;
+        }
     }
 
     function style(feature) {
@@ -191,7 +203,7 @@
 
         var div = L.DomUtil.create('div', 'info legend'),
             //grades = [0, mapRound(0.05*max_workers_diff), mapRound(0.15*max_workers_diff), mapRound(0.30*max_workers_diff), mapRound(0.45*max_workers_diff), mapRound(0.60*max_workers_diff), mapRound(0.75*max_workers_diff), mapRound(0.90*max_workers_diff)],
-            grades = [0, 1, mapRound(0.15*max_workers_diff), mapRound(0.40*max_workers_diff), mapRound(0.65*max_workers_diff), mapRound(0.90*max_workers_diff)],
+            grades = [min_workers_diff, mapRound(0.8*min_workers_diff), mapRound(0.55*min_workers_diff), mapRound(0.30*min_workers_diff), mapRound(0.05*min_workers_diff),  0, 1, mapRound(0.15*max_workers_diff), mapRound(0.40*max_workers_diff), mapRound(0.65*max_workers_diff), mapRound(0.90*max_workers_diff)],
 
             labels = [],
             from, to;
@@ -252,8 +264,14 @@ $(document).ready(function() {
                             //console.log('curr: '+max_workers_diff+ ' & test: '+census_data[key].amount_donated)
 
                             // Javascript doesn't like decimal notation ...
-                            if ( parseInt(max_workers_diff) < parseInt(census_data[key].workers_in) ) {
-                                 max_workers_diff = census_data[key].workers_in;
+                            if ( parseInt(max_workers_diff) < parseInt(census_data[key].workers_diff) ) {
+                                 max_workers_diff = census_data[key].workers_diff;
+                            }
+
+                            //console.log('testing:', +min_workers_diff+ ', '+ census_data[key].workers_in)
+
+                            if ( min_workers_diff > census_data[key].workers_diff ) {
+                                 min_workers_diff = census_data[key].workers_diff;
                             }
 
                         }
@@ -262,7 +280,7 @@ $(document).ready(function() {
                         }
                     }
 
-                    //alert(max_workers_diff);
+                    //alert(min_workers_diff);
 
                     geojson = L.geoJson(boundary_data, {
                         style: style,
