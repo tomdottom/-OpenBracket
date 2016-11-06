@@ -13,7 +13,7 @@ function init_map() {
     return mymap
 }
 
-function mapRound(x){
+function roundUpToNearestHundred(x){
     return Math.ceil(x / 100.0) * 100
 }
 
@@ -41,13 +41,12 @@ function make_legend(max_workers_diff) {
     legend.onAdd = function (map) {
 
         var div = L.DomUtil.create('div', 'info legend'),
-            //grades = [0, mapRound(0.05*max_workers_diff), mapRound(0.15*max_workers_diff), mapRound(0.30*max_workers_diff), mapRound(0.45*max_workers_diff), mapRound(0.60*max_workers_diff), mapRound(0.75*max_workers_diff), mapRound(0.90*max_workers_diff)],
             grades = [
                 0,
-                mapRound(0.15 * max_workers_diff),
-                mapRound(0.40 * max_workers_diff),
-                mapRound(0.65 * max_workers_diff),
-                mapRound(0.90 * max_workers_diff)
+                roundUpToNearestHundred(0.15 * max_workers_diff),
+                roundUpToNearestHundred(0.40 * max_workers_diff),
+                roundUpToNearestHundred(0.65 * max_workers_diff),
+                roundUpToNearestHundred(0.90 * max_workers_diff)
             ],
 
             labels = [],
@@ -70,12 +69,12 @@ function make_legend(max_workers_diff) {
 };
 
 function getColor(max_workers_diff, d) {
-    return  d > mapRound(0.90*max_workers_diff) ? '#800026' :
-            d > mapRound(0.65*max_workers_diff) ? '#E31A1C' :
-            d > mapRound(0.40*max_workers_diff) ? '#FD8D3C' :
-            d > mapRound(0.15*max_workers_diff) ? '#FED976' :
-            d > 1                               ? '#FFEDA0' :
-                                                  '#FFFFFF';
+    return  d > roundUpToNearestHundred(0.90*max_workers_diff) ? '#800026' :
+            d > roundUpToNearestHundred(0.65*max_workers_diff) ? '#E31A1C' :
+            d > roundUpToNearestHundred(0.40*max_workers_diff) ? '#FD8D3C' :
+            d > roundUpToNearestHundred(0.15*max_workers_diff) ? '#FED976' :
+            d > 1                                              ? '#FFEDA0' :
+                                                                 '#FFFFFF';
 }
 
 function style(max_workers_diff, feature) {
