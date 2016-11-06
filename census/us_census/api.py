@@ -40,3 +40,35 @@ def get_de_tract_pop(state=states.DE.fips):
     ]
 
     return features
+
+data_types = {
+    'population': 'B01003_001E',
+    # Median age.
+    'age': 'B01002_001E',
+    # (Normalizable) Total time spent commuting (in minutes).
+    'commute_time': 'B08136_001E',
+    # Number of employed, age 16 or older, in the civilian labor force.
+    'employment_employed': 'B23025_004E'
+}
+
+
+def get_de_tract_data(data_type, state=states.DE.fips):
+    data = census.acs5.get(
+        data_types[data_type],
+        geo={'for': 'tract:*', 'in': 'state:{}'.format(state)}
+    )
+
+    for datum in data:
+        datum[data_type] = datum[data_types[data_type]]
+        del datum[data_types[data_type]]
+
+    features = [
+        {
+            "type": "Feature",
+            'properties': datum,
+            'geometry':  tract_geometries.get(datum['tract'])
+        }
+        for datum in data
+    ]
+
+    return features

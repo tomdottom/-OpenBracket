@@ -1,6 +1,4 @@
-import json
-
-from flask import Blueprint, current_app, Response
+from flask import Blueprint
 from flask_restful import Resource, Api
 
 import us_census.query
@@ -22,6 +20,11 @@ class Census(Resource):
 class TractPopulations(Resource):
     def get(self):
         return us_census.api.get_de_tract_pop()
+
+
+class CensusTractData(Resource):
+    def get(self, data_type):
+        return us_census.api.get_de_tract_data(data_type)
 
 
 class CensusOriginDestinationEmployment(Resource):
@@ -47,3 +50,4 @@ api.add_resource(
 )
 api.add_resource(TractPopulations, '/tract_populations/')
 api.add_resource(Census, '/census/')
+api.add_resource(CensusTractData, '/census/<string:data_type>')
