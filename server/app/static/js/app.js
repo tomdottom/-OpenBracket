@@ -13,11 +13,7 @@ function init_map() {
     return mymap
 }
 
-function roundUpToNearestHundred(x){
-    return Math.ceil(x / 100.0) * 100
-}
-
-function make_info_control() {
+function make_info_control(title, key) {
     var info = L.control();
 
     info.onAdd = function (map) {
@@ -27,8 +23,7 @@ function make_info_control() {
     };
 
     info.update = function (props) {
-        // this._div.innerHTML = props.population;
-        this._div.innerHTML = '<h4>Population: ' + (props ? props.population : '-') + '</h4>'
+        this._div.innerHTML = '<h4>' + title + ': ' + (props ? _.get(props, key) : '-') + '</h4>'
     };
 
     return info;
@@ -43,10 +38,10 @@ function make_legend(max_workers_diff) {
         var div = L.DomUtil.create('div', 'info legend'),
             grades = [
                 0,
-                roundUpToNearestHundred(0.15 * max_workers_diff),
-                roundUpToNearestHundred(0.40 * max_workers_diff),
-                roundUpToNearestHundred(0.65 * max_workers_diff),
-                roundUpToNearestHundred(0.90 * max_workers_diff)
+                Math.ceil(0.15 * max_workers_diff),
+                Math.ceil(0.40 * max_workers_diff),
+                Math.ceil(0.65 * max_workers_diff),
+                Math.ceil(0.90 * max_workers_diff)
             ],
 
             labels = [],
@@ -69,22 +64,22 @@ function make_legend(max_workers_diff) {
 };
 
 function getColor(max_workers_diff, d) {
-    return  d > roundUpToNearestHundred(0.90*max_workers_diff) ? '#800026' :
-            d > roundUpToNearestHundred(0.65*max_workers_diff) ? '#E31A1C' :
-            d > roundUpToNearestHundred(0.40*max_workers_diff) ? '#FD8D3C' :
-            d > roundUpToNearestHundred(0.15*max_workers_diff) ? '#FED976' :
+    return  d > Math.ceil(0.90*max_workers_diff) ? '#800026' :
+            d > Math.ceil(0.65*max_workers_diff) ? '#E31A1C' :
+            d > Math.ceil(0.40*max_workers_diff) ? '#FD8D3C' :
+            d > Math.ceil(0.15*max_workers_diff) ? '#FED976' :
             d > 1                                              ? '#FFEDA0' :
                                                                  '#FFFFFF';
 }
 
-function style(max_workers_diff, feature) {
+function style(max_workers_diff, key, feature) {
     return {
         weight: 2,
         opacity: 1,
         color: 'white',
         dashArray: '3',
         fillOpacity: 0.7,
-        fillColor: getColor(max_workers_diff, feature.properties.population)
+        fillColor: getColor(max_workers_diff, _.get(feature.properties, key))
     };
 }
 
@@ -101,26 +96,26 @@ function highlightFeature(info, e) {
     info.update(layer.feature.properties);
 }
 
-function resetHighlight(info, max_workers_diff, e) {
+function resetHighlight(info, max_workers_diff, key, e) {
     var layer = e.target;
     L.geoJSON(null, {
-        style: _.partial(style, max_workers_diff),
-        onEachFeature: _.partial(onEachFeature, info, max_workers_diff)
+        style: _.partial(style, max_workers_diff, key),
+        onEachFeature: _.partial(onEachFeature, info, max_workers_diff, key)
     }).resetStyle(e.target);
     info.update();
 }
 
-function onEachFeature(info, max_workers_diff, feature, layer) {
+function onEachFeature(info, max_workers_diff, key, feature, layer) {
     layer.on({
         mouseover: _.partial(highlightFeature, info),
-        mouseout: _.partial(resetHighlight, info, max_workers_diff),
+        mouseout: _.partial(resetHighlight, info, max_workers_diff, key),
     });
 }
 
-function addGeoJSONItem(map, max_workers_diff, info, item) {
+function addGeoJSONItem(map, max_workers_diff, info, key, item) {
     L.geoJSON(item, {
-        style: _.partial(style, max_workers_diff),
-        onEachFeature: _.partial(onEachFeature, info, max_workers_diff)
+        style: _.partial(style, max_workers_diff, key),
+        onEachFeature: _.partial(onEachFeature, info, max_workers_diff, key)
     }).addTo(map)
 }
 
@@ -128,15 +123,27 @@ function getPopulation(item) {
     return parseInt(item.properties.population, 10)
 }
 
+function getData(key, item) {
+    return parseInt(_.get(item.properties, key), 10)
+}
+
 $(document).ready(function() {
 
     var map = init_map();
 
-    $.get('/api/tract_populations/')
+    var url = '/api/census/age',
+        key = 'age',
+        description = 'Average Age';
+
+    var url = '/api/census/population',
+        key = 'population',
+        description = 'Population';
+
+    $.get(url)
         .then(function(data) {
-            var max_workers_diff = _.max(_.map(data, getPopulation));
-            var info = make_info_control();
-            _.each(data, _.partial(addGeoJSONItem, map, max_workers_diff, info));
+            var max_workers_diff = _.max(_.map(data, _.partial(getData, key)));
+            var info = make_info_control(description, key);
+            _.each(data, _.partial(addGeoJSONItem, map, max_workers_diff, info, key));
             var legend = make_legend(max_workers_diff);
             info.addTo(map);
             legend.addTo(map);
