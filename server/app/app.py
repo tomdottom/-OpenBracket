@@ -30,12 +30,17 @@ app.register_blueprint(api_bp, url_prefix='/api')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template(
+        'index.html',
+        available_data_endpoints=available_data_endpoints.keys(),
+    )
 
 
 available_data_endpoints = {
     'age': ('age', 'Average Age'),
     'commute-time': ('commute_time', 'Commute Time'),
+    'income': ('income', 'Median Income'),
+    'population': ('population', 'Population'),
     'employment': ('employment_employed', 'Employeed'),
 }
 
@@ -45,5 +50,6 @@ def census_data(data_type):
     category, description = available_data_endpoints[data_type]
     return render_template(
         'census_heatmap.html',
+        available_data_endpoints=available_data_endpoints.keys(),
         category=category,
         description=description)

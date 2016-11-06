@@ -48,7 +48,9 @@ data_types = {
     # (Normalizable) Total time spent commuting (in minutes).
     'commute_time': 'B08136_001E',
     # Number of employed, age 16 or older, in the civilian labor force.
-    'employment_employed': 'B23025_004E'
+    'employment_employed': 'B23025_004E',
+    # Median household income in the past 12 months (in 2013 inflation-adjusted dollars).
+    'income': 'B19013_001E',
 }
 
 

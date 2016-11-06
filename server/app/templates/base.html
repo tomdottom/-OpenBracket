@@ -60,12 +60,11 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="#">Census Visualisation</a>
                 <ul class="nav navbar-nav">
-                <li><a href="/">Population</a></li>
-                <li><a href="/census/age">Age</a></li>
-                <li><a href="/census/commute-time">Commute Time</a></li>
-                <li><a href="/census/employment">Employment</a></li>
+                {% for endpoint in available_data_endpoints %}
+                <li><a href="/census/{{ endpoint }}">{{ endpoint }}</a></li>
+                {% endfor %}
                 <li><a href="/worker-flow">Worker Flow</a></li>
-            </div>
+                </div>
         </div>
     </nav>
     <div class="container">
