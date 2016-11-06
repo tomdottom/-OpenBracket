@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script src="/static/js/app.js"></script>
+    <script>
+	$(document).ready(function() {
+	    main('{{ category }}', '{{ description }}');
+	})
+    </script>
+{% endblock %}
