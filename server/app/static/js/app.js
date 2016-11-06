@@ -127,18 +127,9 @@ function getData(key, item) {
     return parseInt(_.get(item.properties, key), 10)
 }
 
-$(document).ready(function() {
-
+function main(key, description) {
+    var url = '/api/census/' + key;
     var map = init_map();
-
-    var url = '/api/census/age',
-        key = 'age',
-        description = 'Average Age';
-
-    var url = '/api/census/population',
-        key = 'population',
-        description = 'Population';
-
     $.get(url)
         .then(function(data) {
             var max_workers_diff = _.max(_.map(data, _.partial(getData, key)));
@@ -148,4 +139,4 @@ $(document).ready(function() {
             info.addTo(map);
             legend.addTo(map);
         });
-})
+}

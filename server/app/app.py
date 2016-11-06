@@ -27,12 +27,26 @@ models.db = db
 
 app.register_blueprint(api_bp, url_prefix='/api')
 
+
 @app.route('/')
 def index():
-    return render_template('index.html', name="foo")
+    return render_template('index.html')
 
 
-@app.route('/worker_flow')
+@app.route('/age')
+def age():
+    return render_template('age.html')
+
+
+@app.route('/commute-time')
+def commute_time():
+    return render_template('commute_time.html')
+
+
+@app.route('/employment')
+def employment():
+	return render_template('employment_employed.html')
+
+@app.route('/worker-flow')
 def worker_flow():
     return render_template('worker_flow.html', name="foo")
-
